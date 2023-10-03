@@ -5,7 +5,7 @@ CREATE TABLE CLIENTS(
     address VARCHAR(500) NOT NULL,
     date_of_birth DATE NOT NULL);
 
-CREATE TYPE product_type AS ENUM('retirement', 'tfsa', 'savings');
+CREATE TYPE product_type AS ENUM('RETIREMENT', 'TFSA', 'SAVINGS');
 
 CREATE TABLE FINANCIAL_PRODUCTS(
     id BIGSERIAL PRIMARY KEY,
