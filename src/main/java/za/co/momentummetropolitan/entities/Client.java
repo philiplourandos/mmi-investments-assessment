@@ -3,7 +3,9 @@ package za.co.momentummetropolitan.entities;
 import java.time.LocalDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
+@Table("clients")
 public class Client {
     @Id
     private Long id;

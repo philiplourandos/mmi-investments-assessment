@@ -5,14 +5,14 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import za.co.momentummetropolitan.exceptions.EmailNotFoundException;
+import za.co.momentummetropolitan.exceptions.ClientIdlNotFoundException;
 
 @ControllerAdvice
 public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler({EmailNotFoundException.class})
-    public ProblemDetail handleEmailNotFound(final EmailNotFoundException exception) {
+    @ExceptionHandler({ClientIdlNotFoundException.class})
+    public ProblemDetail handleEmailNotFound(final ClientIdlNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, 
-                String.format("Email Address: %s does not exsit", exception.getEmail()));
+                String.format("Id: %d does not exsit", exception.getId()));
     }
 }

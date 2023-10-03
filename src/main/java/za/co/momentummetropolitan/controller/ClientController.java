@@ -1,6 +1,5 @@
 package za.co.momentummetropolitan.controller;
 
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,8 +18,8 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping("/{email}")
-    public ResponseEntity<ClientInfoResponse> getClientInfo(@NotBlank @PathVariable("email") final String email) {
-        return ResponseEntity.ok(clientService.retrieveClientInfo(email));
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientInfoResponse> getClientInfo(@PathVariable("id") final Long id) {
+        return ResponseEntity.ok(clientService.retrieveClientInfo(id));
     }
 }
