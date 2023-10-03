@@ -57,4 +57,10 @@ public class ClientInfoTest {
         mvc.perform(get("/client/{id}", "445566"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void givenAnonymousUser_whenSubmittingValidId_thenFailWith403() throws Exception {
+        mvc.perform(get("/client/{id}", TestConst.VALID_CLIENT_ID))
+                .andExpect(status().isForbidden());
+    }
 }
