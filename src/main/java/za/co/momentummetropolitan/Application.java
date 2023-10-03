@@ -16,8 +16,10 @@ public class Application {
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity security) throws Exception {
-        security.authorizeHttpRequests(authz -> {
-            authz.requestMatchers(HttpMethod.GET, "/client/*")
+        security.authorizeHttpRequests(authz -> { authz
+                .requestMatchers(HttpMethod.GET, "/client/*")
+                    .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER)
+                .requestMatchers(HttpMethod.GET, "/client/products/*")
                     .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER);
         });
 
