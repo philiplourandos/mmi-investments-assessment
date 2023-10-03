@@ -1,7 +1,8 @@
 CREATE TABLE CLIENTS(
     id BIGSERIAL PRIMARY KEY,
     client_name VARCHAR(200) NOT NULL,
-    email VARCHAR(200) NOT NULL,
+    mobile_number VARCHAR(10) NOT NULL,
+    email VARCHAR(200) NOT NULL UNIQUE,
     address VARCHAR(500) NOT NULL,
     date_of_birth DATE NOT NULL);
 
@@ -16,7 +17,7 @@ CREATE TABLE CLIENT_PRODUCTS(
     id BIGSERIAL PRIMARY KEY,
     client_id BIGINT NOT NULL,
     financial_product_id BIGINT NOT NULL,
-    balance DECIMAL(20,2);
+    balance DECIMAL(20,2));
 
 ALTER TABLE CLIENT_PRODUCTS ADD CONSTRAINT fk_client_id FOREIGN KEY (client_id) REFERENCES CLIENTS(id);
 ALTER TABLE CLIENT_PRODUCTS ADD CONSTRAINT fk_financial_products_id FOREIGN KEY (financial_product_id) REFERENCES FINANCIAL_PRODUCTS(id);
