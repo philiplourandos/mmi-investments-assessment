@@ -41,12 +41,12 @@ public class ClientProductTest {
                 .andExpect(jsonPath("$.[0].id", notNullValue()))
                 .andExpect(jsonPath("$.[0].id", isA(Integer.class)))
                 .andExpect(jsonPath("$.[0].productName", is("Momentum Money")))
-                .andExpect(jsonPath("$.[0].balance", is(120300.00)))
+                .andExpect(jsonPath("$.[0].balance", is(36000.00)))
                 .andExpect(jsonPath("$.[0].type", is("SAVINGS")))
                 .andExpect(jsonPath("$.[1].id", notNullValue()))
                 .andExpect(jsonPath("$.[1].id", isA(Integer.class)))
                 .andExpect(jsonPath("$.[1].productName", is("Momentum RA")))
-                .andExpect(jsonPath("$.[1].balance", is(3000000.12)))
+                .andExpect(jsonPath("$.[1].balance", is(500000.00)))
                 .andExpect(jsonPath("$.[1].type", is("RETIREMENT")));
     }
 

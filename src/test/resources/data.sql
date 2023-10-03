@@ -14,8 +14,8 @@ INSERT INTO FINANCIAL_PRODUCTS(name, type) VALUES('Momentum RA', 'RETIREMENT');
 INSERT INTO CLIENT_PRODUCTS(client_id, financial_product_id, balance) 
     VALUES((SELECT id FROM CLIENTS WHERE email = 'philip.lourandos@gmail.com'),
            (SELECT id FROM FINANCIAL_PRODUCTS WHERE name = 'Momentum RA'),
-           3000000.12);
+           500000.00);
 INSERT INTO CLIENT_PRODUCTS(client_id, financial_product_id, balance) 
     VALUES((SELECT id FROM CLIENTS WHERE email = 'philip.lourandos@gmail.com'),
            (SELECT id FROM FINANCIAL_PRODUCTS WHERE name = 'Momentum Money'),
-           120300.00);
+           36000.00);
