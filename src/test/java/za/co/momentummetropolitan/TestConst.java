@@ -6,4 +6,6 @@ public final class TestConst {
     public static final DockerImageName POSTGRES_IMAGE = DockerImageName.parse("postgres:16.0-alpine");
 
     public static final String VALID_CLIENT_ID = "2600";
+    public static final String VALID_CLIENT_ID_WITH_NOT_PRODUCTS = "6667";
+    
 }
