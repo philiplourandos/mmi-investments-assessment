@@ -1,5 +1,6 @@
 package za.co.momentummetropolitan;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -10,15 +11,26 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +48,8 @@ import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles({"test"})
 public class WithdrawNegativeScenarioTest {
+    private static final Logger LOG = LoggerFactory.getLogger(WithdrawNegativeScenarioTest.class);
+    
     private static final String EXPECTED_RA_BALANCE = "500000.00";
     private static final String EXPECTED_SAVINGS_BALANCE = "36000.00";
 
@@ -193,5 +207,35 @@ public class WithdrawNegativeScenarioTest {
                          """)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+    
+    @ParameterizedTest
+    @MethodSource("loadInvalidWithdrawRequests")
+    @WithMockUser(username = "jose", authorities = {AuthoritiesConst.CLIENT})
+    public void givenAuthenticatedClient_whenSupplyingInvalidRequest_thenFailWith400(final String payload)
+            throws Exception {
+        mvc.perform(post("/client/withdraw")
+                .accept(MediaType.APPLICATION_JSON)
+                .content(payload)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    private static Stream<Arguments> loadInvalidWithdrawRequests() {
+        return List.of(new ClassPathResource("invalid-requests/missing-client-product-id.json"),
+                new ClassPathResource("invalid-requests/missing-withdraw-amount.json"))
+                .stream()
+                .map(m -> {
+                    try {
+                        return Files.readString(Path.of(m.getURI()));
+                    } catch (IOException ioEx) {
+                        LOG.error("Unable to load file: [{}]", m.getPath());
+
+                        return null;
+                    }
+                })
+                .map(Arguments::of)
+                .collect(toList())
+                .stream();
     }
 }
