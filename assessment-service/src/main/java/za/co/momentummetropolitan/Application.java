@@ -18,12 +18,12 @@ public class Application {
 
     @Bean
     public SecurityFilterChain filterChain(final HttpSecurity security) throws Exception {
-        security.authorizeHttpRequests(authz -> { authz
+        security.csrf().disable().authorizeHttpRequests(authz -> { authz
                 .requestMatchers(HttpMethod.GET, "/client/*")
                     .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER)
                 .requestMatchers(HttpMethod.GET, "/client/products/*")
                     .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER)
-                .requestMatchers(HttpMethod.POST, "/client/withdraw")
+                .requestMatchers(HttpMethod.POST, "/client/withdraw/**")
                     .hasAnyAuthority(AuthoritiesConst.CLIENT);
         });
 
