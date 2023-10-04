@@ -1,5 +1,6 @@
 package za.co.momentummetropolitan;
 
+import java.time.Clock;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -26,5 +27,10 @@ public class Application {
         });
 
         return security.build();
+    }
+
+    @Bean
+    public Clock defaultClock() {
+        return Clock.systemDefaultZone();
     }
 }
