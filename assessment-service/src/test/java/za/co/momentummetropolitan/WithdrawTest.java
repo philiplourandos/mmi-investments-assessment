@@ -1,11 +1,13 @@
 package za.co.momentummetropolitan;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.function.Supplier;
@@ -50,7 +52,7 @@ public class WithdrawTest {
     public void givenAuthenticatedClient_whenSubmittingWithdrawThatPassesValidation_thenPassWith204() throws Exception {
         // given
         when(mockDateSupplier.get()).thenReturn(LocalDate.of(2050, Month.JUNE, 4));
-        final ClientProduct clientsRetriementProduct = clientFinProdRepo.findByClientIdAndType(
+        final ClientProduct clientsRetirementProduct = clientFinProdRepo.findByClientIdAndType(
                 Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
                 .orElseThrow();
 
@@ -59,14 +61,19 @@ public class WithdrawTest {
                 .accept(MediaType.APPLICATION_JSON)
                 .content("""
                          {
-                            "clientProductId": %s,
-                            "amount": 50000,
+                            "clientProductId": "%s",
+                            "amount": "50000"
                          }
-                         """.formatted(clientsRetriementProduct.getId()))
+                         """.formatted(clientsRetirementProduct.getId()))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         // then
         verify(mockDateSupplier, times(1)).get();
+        
+        final ClientProduct updatedClientProduct = clientFinProdRepo.findByClientIdAndType(
+                Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
+                .orElseThrow();
+        assertEquals(BigDecimal.valueOf(450000), updatedClientProduct.getBalance());
     }
 }
