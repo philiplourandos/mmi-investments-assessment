@@ -10,7 +10,7 @@ public class FinancialProduct {
     @Id
     private Long id;
     private String  name;
-    @Column("product_type")
+    @Column("type")
     private FinancialProductsEnum productType;
 
     public FinancialProduct() {
