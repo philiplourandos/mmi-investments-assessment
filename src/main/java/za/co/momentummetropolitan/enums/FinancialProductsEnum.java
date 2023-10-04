@@ -1,5 +1,5 @@
 package za.co.momentummetropolitan.enums;
 
 public enum FinancialProductsEnum {
-    SAVINGS, TFSA, RETIREMENT
+    SAVINGS, TFSA, RETIREMENT, INVESTMENTS
 }
