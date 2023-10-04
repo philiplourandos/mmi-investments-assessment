@@ -50,7 +50,7 @@ public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handlePercentageWithdrawExceeded(
             final WithdrawPercentageExceedsThresholdException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, 
-                format("Max withdraw percentage is: [%d]. The amount requested to be withdrawn: [%s] exceeds it.",
+                format("Max withdraw percentage is: [%s]. The amount requested to be withdrawn: [%s] exceeds it.",
                         exception.getMaxWithdrawPercentage(), exception.getRequestedWithDrawPercentage()));
     }
 }
