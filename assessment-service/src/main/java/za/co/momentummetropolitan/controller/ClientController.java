@@ -1,23 +1,32 @@
 package za.co.momentummetropolitan.controller;
 
 import java.util.List;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import za.co.momentummetropolitan.dto.ClientFinancialProduct;
 import za.co.momentummetropolitan.dto.ClientInfoResponse;
+import za.co.momentummetropolitan.dto.WithdrawFundsRequest;
 import za.co.momentummetropolitan.service.ClientService;
+import za.co.momentummetropolitan.service.WithdrawlService;
 
 @RestController
 @RequestMapping("/client")
 public class ClientController {
 
     private final ClientService clientService;
+    private final WithdrawlService withdrawService;
 
-    public ClientController(final ClientService clientService) {
+    public ClientController(final ClientService clientService,
+            final WithdrawlService withdrawService) {
         this.clientService = clientService;
+        this.withdrawService = withdrawService;
     }
 
     @GetMapping("/{id}")
@@ -34,5 +43,12 @@ public class ClientController {
         } else {
             return ResponseEntity.ok(clientProducts);
         }
+    }
+
+    @PostMapping("/withdraw")
+    public ResponseEntity withdrawFunds(@Validated @RequestBody final WithdrawFundsRequest request) {
+        withdrawService.withdrawl(request.clientProductId(), request.amount());
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT);
     }
 }
