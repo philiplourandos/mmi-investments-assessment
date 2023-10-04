@@ -119,8 +119,11 @@ public class ClientFinancialProductRepository {
         jdbc.update(
                 """
                 UPDATE
-                    CLIENT_PRODUCTS(client_id, financial_product_id, balance)
-                SET(?,?,?)
+                    CLIENT_PRODUCTS
+                SET
+                    client_id = ?,
+                    financial_product_id = ?,
+                    balance = ?
                 WHERE
                     id = ?
                 """, (pss) -> {
