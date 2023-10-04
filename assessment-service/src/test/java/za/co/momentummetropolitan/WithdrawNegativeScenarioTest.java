@@ -178,4 +178,20 @@ public class WithdrawNegativeScenarioTest {
                 .orElseThrow();
         assertEquals(expectedBalance, updatedClientProduct.getBalance().toString());
     }
+
+    @Test
+    @WithMockUser(username = "jose", authorities = {AuthoritiesConst.CLIENT})
+    public void givenAuthenticatedClient_whenSupplyingInvalidClientProductId_thenFailWith404()
+            throws Exception {
+        mvc.perform(post("/client/withdraw")
+                .accept(MediaType.APPLICATION_JSON)
+                .content("""
+                         {
+                            "clientProductId": "9996655",
+                            "amount": "500000"
+                         }
+                         """)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
 }
