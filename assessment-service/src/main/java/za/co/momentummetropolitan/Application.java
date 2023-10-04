@@ -20,7 +20,9 @@ public class Application {
                 .requestMatchers(HttpMethod.GET, "/client/*")
                     .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER)
                 .requestMatchers(HttpMethod.GET, "/client/products/*")
-                    .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER);
+                    .hasAnyAuthority(AuthoritiesConst.CLIENT, AuthoritiesConst.BROKER)
+                .requestMatchers(HttpMethod.POST, "/client/withdraw")
+                    .hasAnyAuthority(AuthoritiesConst.CLIENT);
         });
 
         return security.build();
