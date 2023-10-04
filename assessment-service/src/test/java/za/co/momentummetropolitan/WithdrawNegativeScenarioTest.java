@@ -130,7 +130,7 @@ public class WithdrawNegativeScenarioTest {
         // when
         run90PercentWithdrawExceed(expectedExceededPercent, withdrawAmount,
                 EXPECTED_RA_BALANCE, FinancialProductsEnum.RETIREMENT);
-        
+
         // then
         verify(mockDateSupplier, times(1)).get();
     }
