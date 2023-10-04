@@ -19,7 +19,7 @@ public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({ClientIdlNotFoundException.class})
     public ProblemDetail handleClientIdNotFound(final ClientIdlNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, 
-                format("Id: [%d] does not exsit", exception.getId()));
+                format("Id: [%d] does not exist", exception.getId()));
     }
 
     @ExceptionHandler({ClientProductIdNotFoundException.class})
@@ -34,7 +34,7 @@ public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleNotAtRetirementAge(
             final RetirementAgeNotAttainedException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, 
-                format("CLient's birth date is: [%s], they are [%d] years before retirement age.",
+                format("Client's birth date is: [%s], they are [%d] years before retirement age.",
                         exception.getDateOfBirth(), exception.getYearsDifference()));
     }
 
