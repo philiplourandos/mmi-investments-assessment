@@ -2,7 +2,7 @@ package za.co.momentummetropolitan.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import za.co.momentummetropolitan.dto.ClientFinancialProducts;
+import za.co.momentummetropolitan.dto.ClientFinancialProduct;
 import za.co.momentummetropolitan.dto.ClientInfoResponse;
 import za.co.momentummetropolitan.exceptions.ClientIdlNotFoundException;
 import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
@@ -26,9 +26,9 @@ public class ClientService {
                 .orElseThrow(() -> new ClientIdlNotFoundException(id));
     }
 
-    public List<ClientFinancialProducts> retrieveClientProducts(final Long id) {
-        clientRepo.findById(id).orElseThrow(() -> new ClientIdlNotFoundException(id));
+    public List<ClientFinancialProduct> retrieveClientProducts(final Long clientId) {
+        clientRepo.findById(clientId).orElseThrow(() -> new ClientIdlNotFoundException(clientId));
 
-        return clientProductsRepo.getClientProducts(id);
+        return clientProductsRepo.findClientProductsByClientId(clientId);
     }
 }
