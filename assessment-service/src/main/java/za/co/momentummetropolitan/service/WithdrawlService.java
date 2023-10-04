@@ -14,6 +14,7 @@ import za.co.momentummetropolitan.enums.FinancialProductsEnum;
 import za.co.momentummetropolitan.exceptions.ClientProductIdNotFoundException;
 import za.co.momentummetropolitan.exceptions.RetirementAgeNotAttainedException;
 import za.co.momentummetropolitan.exceptions.WithdrawAmountExceedsBalanceException;
+import za.co.momentummetropolitan.exceptions.WithdrawPercentageExceedsThresholdException;
 import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
 import za.co.momentummetropolitan.repository.ClientRepository;
 import za.co.momentummetropolitan.repository.FinancialProductRepository;
@@ -66,10 +67,10 @@ public class WithdrawlService {
         }
         
         // check that withdrawl amount not greater than 90% of the balance
-        final BigDecimal withdrawPercentage = withdrawAmount.divide(balance, RoundingMode.HALF_UP)
-                .divide(PERCENTAGE, RoundingMode.CEILING);
+        final BigDecimal withdrawPercentage = withdrawAmount.divide(balance)
+                .multiply(PERCENTAGE);
         if (withdrawPercentage.compareTo(maxWithdrawPercentage) > 0) {
-            throw new WithdrawAmountExceedsBalanceException(balance, withdrawAmount);
+            throw new WithdrawPercentageExceedsThresholdException(maxWithdrawPercentage, withdrawPercentage);
         }
 
         foundClientProduct.setBalance(balance.subtract(withdrawAmount));
