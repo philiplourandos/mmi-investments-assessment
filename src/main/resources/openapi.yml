@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: Momentum investments client API
+  version: 0.0.1
+paths:
+  /client/{id}:
+    get:
+      summary: Retrieve client information via the id
+      parameters:
+        - name: id 
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Client information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetClientInfoResponse'
+        '403':
+          description: Roles missing from user making REST call
+        '404':
+          description: No client with that id
+  /client/products/{id}:
+    get:
+      summary: Retrieve products client is linked to
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Client has products linked
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetClientProductsResponse'
+        '204':
+          description: Valid client ID however no products linked
+        '403':
+          description: Roles missing from user making REST call
+        '404':
+          description: No client with that id
+components:
+  schemas:
+    GetClientInfoResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+          format: email
+        mobile:
+          type: string
+          pattern: '$d{10}$'
+        birthday:
+          type: string
+          format: date
+    GetClientProductsResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        type:
+          type: string
+          enum: [SAVINGS, TFSA, RETIREMENT, INVESTMENTS]
+        balance:
+          type: number
