@@ -49,6 +49,6 @@ public class ClientController {
     public ResponseEntity withdrawFunds(@Validated @RequestBody final WithdrawFundsRequest request) {
         withdrawService.withdrawl(request.clientProductId(), request.amount());
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
