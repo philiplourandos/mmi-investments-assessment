@@ -1,6 +1,7 @@
 package za.co.momentummetropolitan;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,7 @@ import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
 @ActiveProfiles({"test"})
 public class WithdrawNegativeScenarioTest {
     private static final String EXPECTED_RA_BALANCE = "500000.00";
+    private static final String EXPECTED_SAVINGS_BALANCE = "36000.00";
 
     @Container
     @ServiceConnection
@@ -122,31 +124,58 @@ public class WithdrawNegativeScenarioTest {
     public void givenAuthenticatedValidClient_whenWithdrawingMoreThan90PercentOfTheRA_thenFailWith400()
             throws Exception {
         // given
-        when(mockDateSupplier.get()).thenReturn(LocalDate.of(2050, Month.APRIL, 23));
-        final ClientProduct clientsRetirementProduct = clientFinProdRepo.findByClientIdAndType(
-                Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
-                .orElseThrow();
         final String expectedExceededPercent = "96";
+        final String withdrawAmount = "480000";
+
+        // when
+        run90PercentWithdrawExceed(expectedExceededPercent, withdrawAmount,
+                EXPECTED_RA_BALANCE, FinancialProductsEnum.RETIREMENT);
         
+        // then
+        verify(mockDateSupplier, times(1)).get();
+    }
+
+    @Test
+    @WithMockUser(username = "jose", authorities = {AuthoritiesConst.CLIENT})
+    public void givenAuthenticatedValidClient_whenWithdrawingMoreThan90PercentOfSavingsProduct_thenFailWith400()
+            throws Exception {
+        // given
+        final String expectedExceededPercent = "95";
+        final String withdrawAmount = "34200";
+
+        // when
+        run90PercentWithdrawExceed(expectedExceededPercent, withdrawAmount, 
+                EXPECTED_SAVINGS_BALANCE, FinancialProductsEnum.SAVINGS);
+
+        // then
+        verify(mockDateSupplier, never()).get();
+    }
+
+    private void run90PercentWithdrawExceed(final String expectedExceededPercent,
+            final String withdrawAmount, final String expectedBalance,
+            final FinancialProductsEnum productType) throws Exception {
+        // given
+        when(mockDateSupplier.get()).thenReturn(LocalDate.of(2050, Month.APRIL, 23));
+        final ClientProduct clientProduct = clientFinProdRepo.findByClientIdAndType(
+                Long.valueOf(TestConst.VALID_CLIENT_ID), productType)
+                .orElseThrow();
+
         // when
         mvc.perform(post("/client/withdraw")
                 .accept(MediaType.APPLICATION_JSON)
                 .content("""
                          {
                             "clientProductId": "%s",
-                            "amount": "480000"
+                            "amount": "%s"
                          }
-                         """.formatted(clientsRetirementProduct.getId()))
+                         """.formatted(clientProduct.getId(), withdrawAmount))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.detail", containsString("[%s]".format(expectedExceededPercent))));
 
-        // then
-        verify(mockDateSupplier, times(1)).get();
-
         final ClientProduct updatedClientProduct = clientFinProdRepo.findByClientIdAndType(
-                Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
+                Long.valueOf(TestConst.VALID_CLIENT_ID), productType)
                 .orElseThrow();
-        assertEquals(EXPECTED_RA_BALANCE, updatedClientProduct.getBalance().toString());
+        assertEquals(expectedBalance, updatedClientProduct.getBalance().toString());
     }
 }
