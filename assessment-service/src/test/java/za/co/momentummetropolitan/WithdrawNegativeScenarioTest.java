@@ -49,7 +49,7 @@ import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
 @ActiveProfiles({"test"})
 public class WithdrawNegativeScenarioTest {
     private static final Logger LOG = LoggerFactory.getLogger(WithdrawNegativeScenarioTest.class);
-    
+
     private static final String EXPECTED_RA_BALANCE = "500000.00";
     private static final String EXPECTED_SAVINGS_BALANCE = "36000.00";
 
