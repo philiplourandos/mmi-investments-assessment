@@ -74,6 +74,6 @@ public class WithdrawTest {
         final ClientProduct updatedClientProduct = clientFinProdRepo.findByClientIdAndType(
                 Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
                 .orElseThrow();
-        assertEquals(BigDecimal.valueOf(450000), updatedClientProduct.getBalance());
+        assertEquals("450000.00", updatedClientProduct.getBalance().toString());
     }
 }
