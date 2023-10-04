@@ -1,6 +1,7 @@
 package za.co.momentummetropolitan;
 
-import java.time.Clock;
+import java.time.LocalDate;
+import java.util.function.Supplier;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +31,7 @@ public class Application {
     }
 
     @Bean
-    public Clock defaultClock() {
-        return Clock.systemDefaultZone();
+    public Supplier<LocalDate> defaultDate() {
+        return () -> LocalDate.now();
     }
 }
