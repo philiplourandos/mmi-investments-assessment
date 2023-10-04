@@ -108,7 +108,6 @@
                         <exclude>**/enums/*.*</exclude>
                         <exclude>**/entities/*.*</exclude>
                         <exclude>**/Application.*</exclude>
-                        <exclude>**/repository/*.*</exclude>
                         <exclude>**/dto/*.*</exclude>
                     </excludes>
                     <rules>
