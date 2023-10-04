@@ -40,7 +40,7 @@ public class WithdrawlService {
         this.maxWithdrawPercentage = maxWithdrawPercentage;
     }
 
-    public void withdrawl(final Long clientProductId, final BigDecimal withdrawAmount) {
+    public void withdraw(final Long clientProductId, final BigDecimal withdrawAmount) {
         final ClientProduct foundClientProduct = clientProductsRepo.findById(clientProductId)
                 .orElseThrow(() -> new ClientProductIdNotFoundException(clientProductId));
 
