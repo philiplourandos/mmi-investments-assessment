@@ -212,8 +212,8 @@ public class WithdrawNegativeScenarioTest {
     @ParameterizedTest
     @MethodSource("loadInvalidWithdrawRequests")
     @WithMockUser(username = "jose", authorities = {AuthoritiesConst.CLIENT})
-    public void givenAuthenticatedClient_whenSupplyingInvalidRequest_thenFailWith400(final String payload)
-            throws Exception {
+    public void givenAuthenticatedClient_whenSupplyingInvalidRequest_thenFailWith400(
+            final String payload) throws Exception {
         mvc.perform(post("/client/withdraw")
                 .accept(MediaType.APPLICATION_JSON)
                 .content(payload)
@@ -237,5 +237,21 @@ public class WithdrawNegativeScenarioTest {
                 .map(Arguments::of)
                 .collect(toList())
                 .stream();
+    }
+    
+    @Test
+    @WithMockUser(username = "jose", authorities = {AuthoritiesConst.BROKER})
+    public void givenAuthenticatedBroker_whenSubmittingWithdraw_thenFailWith403()
+            throws Exception {
+        mvc.perform(post("/client/withdraw")
+                .accept(MediaType.APPLICATION_JSON)
+                .content("""
+                         {
+                            "clientProductId": "9996655",
+                            "amount": "500000"
+                         }
+                         """)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 }
