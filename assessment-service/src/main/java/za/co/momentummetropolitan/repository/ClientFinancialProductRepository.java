@@ -16,7 +16,7 @@ public class ClientFinancialProductRepository {
     private static final String CLIENT_PRODUCT_BALANCE = "balance";
     private static final String CLIENT_PRODUCT_FINANCIAL_PRODUCT_ID = "financial_product_id";
     private static final String CLIENT_PRODUCT_CLIENT_ID = "client_id";
-    
+
     private final JdbcTemplate jdbc;
 
     public ClientFinancialProductRepository(final JdbcTemplate jdbc) {
@@ -50,15 +50,15 @@ public class ClientFinancialProductRepository {
                             rs.getBigDecimal(CLIENT_PRODUCT_BALANCE));
                 });
     }
-    
+
     public Optional<ClientProduct> findById(final Long id) {
         final List<ClientProduct> products = jdbc.query(
                 """
                 SELECT
-                    cp.id,
-                    cp.client_id,
-                    cp.financial_product_id,
-                    cp.balance
+                    cp.id AS id,
+                    cp.client_id AS client_id,
+                    cp.financial_product_id AS financial_product_id,
+                    cp.balance AS balance
                 FROM
                     CLIENT_PRODUCTS cp
                 WHERE
@@ -69,7 +69,7 @@ public class ClientFinancialProductRepository {
                             rs.getLong(CLIENT_PRODUCT_FINANCIAL_PRODUCT_ID), 
                             rs.getBigDecimal(CLIENT_PRODUCT_BALANCE));
                 });
-        
+
         if (products.isEmpty()) {
             return Optional.empty();
         } else {
