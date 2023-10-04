@@ -42,7 +42,7 @@ public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handleWithDrawExceedsBalance(
             final WithdrawAmountExceedsBalanceException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                format("Client's product balance is: [%d] and the withdraw amount: [%d] exceeds it.",
+                format("Client's product balance is: [%s] and the withdraw amount: [%s] exceeds it.",
                         exception.getProductBalance(), exception.getWithdrawAmount()));
     }
 
@@ -50,7 +50,7 @@ public class RESTExceptionHandler extends ResponseEntityExceptionHandler {
     public ProblemDetail handlePercentageWithdrawExceeded(
             final WithdrawPercentageExceedsThresholdException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, 
-                format("Max withdraw percentage is: [%d]. The amount requested to be withdrawn: [%d] exceeds it.",
+                format("Max withdraw percentage is: [%d]. The amount requested to be withdrawn: [%s] exceeds it.",
                         exception.getMaxWithdrawPercentage(), exception.getRequestedWithDrawPercentage()));
     }
 }
