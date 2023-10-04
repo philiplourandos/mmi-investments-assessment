@@ -1,9 +1,11 @@
 package za.co.momentummetropolitan.repository;
 
-import java.math.BigDecimal;
+import java.sql.JDBCType;
+import java.sql.SQLType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import za.co.momentummetropolitan.dto.ClientFinancialProduct;
 import za.co.momentummetropolitan.entities.ClientProduct;
@@ -19,9 +21,50 @@ public class ClientFinancialProductRepository {
     private static final String CLIENT_PRODUCT_CLIENT_ID = "client_id";
 
     private final JdbcTemplate jdbc;
+    
+    private static final RowMapper<ClientProduct> CLIENT_PRODUCT_ROW_MAPPER = (rs, i) -> {
+        return new ClientProduct(rs.getLong(CLIENT_PRODUCT_ID), 
+                rs.getLong(CLIENT_PRODUCT_CLIENT_ID), 
+                rs.getLong(CLIENT_PRODUCT_FINANCIAL_PRODUCT_ID), 
+                rs.getBigDecimal(CLIENT_PRODUCT_BALANCE));
+    };
 
     public ClientFinancialProductRepository(final JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+    }
+
+    public Optional<ClientProduct> findByClientIdAndType(final Long clientId,
+            final FinancialProductsEnum financialProduct) {
+        final List<ClientProduct> soughtAfter = jdbc.query(
+                """
+                SELECT
+                    cp.id AS id,
+                    cp.client_id AS client_id,
+                    cp.financial_product_id AS financial_product_id,
+                    cp.balance AS balance
+                FROM
+                    FINANCIAL_PRODUCTS fp,
+                    CLIENT_PRODUCTS cp,
+                    CLIENTS c
+                WHERE
+                    c.id = ?
+                    AND
+                    cp.client_id = c.id
+                    AND
+                    fp.type = ?
+                    AND
+                    cp.financial_product_id = fp.id
+                """, (pss) -> {
+                    pss.setLong(1, clientId);
+                    pss.setString(2, financialProduct.toString());
+                },
+                CLIENT_PRODUCT_ROW_MAPPER);
+
+        if (soughtAfter.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(soughtAfter.get(0));
+        }
     }
 
     public List<ClientFinancialProduct> findClientProductsByClientId(final Long clientId) {
@@ -64,12 +107,7 @@ public class ClientFinancialProductRepository {
                     CLIENT_PRODUCTS cp
                 WHERE
                     cp.id = ?
-                """, (pss) -> pss.setLong(1, id), (rs, i) -> {
-                    return new ClientProduct(rs.getLong(CLIENT_PRODUCT_ID), 
-                            rs.getLong(CLIENT_PRODUCT_CLIENT_ID), 
-                            rs.getLong(CLIENT_PRODUCT_FINANCIAL_PRODUCT_ID), 
-                            rs.getBigDecimal(CLIENT_PRODUCT_BALANCE));
-                });
+                """, (pss) -> pss.setLong(1, id), CLIENT_PRODUCT_ROW_MAPPER);
 
         if (products.isEmpty()) {
             return Optional.empty();
