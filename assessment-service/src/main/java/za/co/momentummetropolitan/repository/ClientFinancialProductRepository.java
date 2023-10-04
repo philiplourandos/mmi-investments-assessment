@@ -1,5 +1,6 @@
 package za.co.momentummetropolitan.repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -75,5 +76,21 @@ public class ClientFinancialProductRepository {
         } else {
             return Optional.of(products.get(0));
         }
+    }
+
+    public void save(final ClientProduct updatedClientProduct) {
+        jdbc.update(
+                """
+                UPDATE
+                    CLIENT_PRODUCTS(client_id, financial_product_id, balance)
+                SET(?,?,?)
+                WHERE
+                    id = ?
+                """, (pss) -> {
+                    pss.setLong(1, updatedClientProduct.getClientId());
+                    pss.setLong(2, updatedClientProduct.getFinancialProductId());
+                    pss.setBigDecimal(3, updatedClientProduct.getBalance());
+                    pss.setLong(4, updatedClientProduct.getId());
+                });
     }
 }
