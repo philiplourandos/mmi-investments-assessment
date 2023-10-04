@@ -20,7 +20,7 @@ public class ClientFinancialProductRepository {
     private static final String CLIENT_PRODUCT_CLIENT_ID = "client_id";
 
     private final JdbcTemplate jdbc;
-    
+
     private static final RowMapper<ClientProduct> CLIENT_PRODUCT_ROW_MAPPER = (rs, i) -> {
         return new ClientProduct(rs.getLong(CLIENT_PRODUCT_ID), 
                 rs.getLong(CLIENT_PRODUCT_CLIENT_ID), 
