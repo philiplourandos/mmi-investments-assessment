@@ -2,7 +2,7 @@
 
 ## Setup
 
-- On linux or mac install [http://sdkman.io](SDKMan). Once installed open a terminal and run: `sdk env install`.
+- On linux or mac install [SDKMan](http://sdkman.io). Once installed open a terminal and run: `sdk env install`
 - docker or podman is required as test cases use a Postgres container image
 
 ## Project Structure
@@ -13,3 +13,8 @@ The root directory of this project contains the parent pom to build:
 - `assessment-service` - This is the actual service
 
 `mvn clean install` can be used to built all the modules
+
+## CI
+
+CI has been configured with github actions and builds can be viewed [here](https://github.com/philiplourandos/mmi-investments-assessment/actions). 
+CI is kicked off as changes are pushed into github.
