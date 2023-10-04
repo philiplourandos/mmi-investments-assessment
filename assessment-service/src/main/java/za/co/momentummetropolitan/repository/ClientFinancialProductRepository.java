@@ -1,7 +1,6 @@
 package za.co.momentummetropolitan.repository;
 
-import java.sql.JDBCType;
-import java.sql.SQLType;
+import java.sql.Types;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -56,7 +55,7 @@ public class ClientFinancialProductRepository {
                     cp.financial_product_id = fp.id
                 """, (pss) -> {
                     pss.setLong(1, clientId);
-                    pss.setString(2, financialProduct.toString());
+                    pss.setObject(2, financialProduct.toString(), Types.OTHER);
                 },
                 CLIENT_PRODUCT_ROW_MAPPER);
 
