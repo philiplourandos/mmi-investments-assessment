@@ -2,6 +2,7 @@ package za.co.momentummetropolitan.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.co.momentummetropolitan.dto.ClientFinancialProduct;
 import za.co.momentummetropolitan.dto.ClientInfoResponse;
 import za.co.momentummetropolitan.exceptions.ClientIdlNotFoundException;
@@ -19,6 +20,7 @@ public class ClientService {
         this.clientProductsRepo = clientProductsRepo;
     }
 
+    @Transactional(readOnly = true)
     public ClientInfoResponse retrieveClientInfo(final Long clientId) {
         return clientRepo.findById(clientId)
                 .map(m -> new ClientInfoResponse(m.getClientName(), m.getAddress(), 
@@ -26,6 +28,7 @@ public class ClientService {
                 .orElseThrow(() -> new ClientIdlNotFoundException(clientId));
     }
 
+    @Transactional(readOnly = true)
     public List<ClientFinancialProduct> retrieveClientProducts(final Long clientId) {
         clientRepo.findById(clientId).orElseThrow(() -> new ClientIdlNotFoundException(clientId));
 

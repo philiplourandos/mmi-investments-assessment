@@ -6,6 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import za.co.momentummetropolitan.entities.Client;
 import za.co.momentummetropolitan.entities.ClientProduct;
 import za.co.momentummetropolitan.entities.FinancialProduct;
@@ -40,6 +41,7 @@ public class WithdrawlService {
         this.maxWithdrawPercentage = maxWithdrawPercentage;
     }
 
+    @Transactional
     public void withdraw(final Long clientProductId, final BigDecimal withdrawAmount) {
         final ClientProduct foundClientProduct = clientProductsRepo.findById(clientProductId)
                 .orElseThrow(() -> new ClientProductIdNotFoundException(clientProductId));
