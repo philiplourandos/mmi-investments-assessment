@@ -19,11 +19,11 @@ public class ClientService {
         this.clientProductsRepo = clientProductsRepo;
     }
 
-    public ClientInfoResponse retrieveClientInfo(final Long id) {
-        return clientRepo.findById(id)
+    public ClientInfoResponse retrieveClientInfo(final Long clientId) {
+        return clientRepo.findById(clientId)
                 .map(m -> new ClientInfoResponse(m.getClientName(), m.getAddress(), 
                         m.getEmail(), m.getMobileNumber(), m.getDateOfBirth()))
-                .orElseThrow(() -> new ClientIdlNotFoundException(id));
+                .orElseThrow(() -> new ClientIdlNotFoundException(clientId));
     }
 
     public List<ClientFinancialProduct> retrieveClientProducts(final Long clientId) {
