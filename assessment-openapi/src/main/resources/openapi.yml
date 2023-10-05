@@ -6,6 +6,8 @@ paths:
   /client/{id}:
     get:
       summary: Retrieve client information via the id
+      security:
+        - bearerAuth: []
       parameters:
         - name: id 
           in: path
@@ -27,6 +29,8 @@ paths:
   /client/products/{id}:
     get:
       summary: Retrieve products client is linked to
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -52,6 +56,8 @@ paths:
   /client/withdraw:
     post:
       summary: Withdraw monies from an investment product the client has
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
