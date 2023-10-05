@@ -49,6 +49,24 @@ paths:
           description: Roles missing from user making REST call
         '404':
           description: No client with that id
+  /client/withdraw:
+    post:
+      summary: Withdraw monies from an investment product the client has
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WithdrawFundsRequest'
+      responses:
+        '204':
+          description: Amount has been withdrawn from balance of the selected client product
+        '400':
+          description: Validation failure for the request
+        '403':
+          description: User making the request does not have a client role
+        '404':
+          description: clientProductId supplied does not exist
 components:
   schemas:
     GetClientInfoResponse:
@@ -79,4 +97,12 @@ components:
           type: string
           enum: [SAVINGS, TFSA, RETIREMENT, INVESTMENTS]
         balance:
+          type: number
+    WithdrawFundsRequest:
+      type: object
+      properties:
+        clientProductId:
+          type: integer
+          format: int64
+        amount:
           type: number
