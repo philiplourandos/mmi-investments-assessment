@@ -13,7 +13,7 @@ public class Withdraw {
     
     @Column("client_product_id")
     private Long clientProductId;
-    
+
     private WithdrawStatusEnum status;
 
     private BigDecimal amount;
