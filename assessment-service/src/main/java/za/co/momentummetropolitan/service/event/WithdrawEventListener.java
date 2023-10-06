@@ -62,7 +62,7 @@ public class WithdrawEventListener implements ApplicationListener<WithdrawEvent>
             }
         }
     }
-    
+
     private void logAudit(final WithdrawStatusEnum status, final BigDecimal previousBalance,
             final Long withdrawId) {
         final WithdrawAuditTracking tracking = new WithdrawAuditTracking();
