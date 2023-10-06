@@ -15,7 +15,7 @@ public class WithdrawAuditTracking {
     @Column("withdraw_id")
     private Long withdrawId;
 
-    @Column("withdraw_status")
+    @Column("status")
     private WithdrawStatusEnum withdrawStatus;
 
     @Column("event_created")
