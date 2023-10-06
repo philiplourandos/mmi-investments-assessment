@@ -9,7 +9,7 @@ import za.co.momentummetropolitan.enums.FinancialProductsEnum;
 public class FinancialProduct {
     @Id
     private Long id;
-    private String  name;
+    private String name;
     @Column("type")
     private FinancialProductsEnum productType;
 
