@@ -102,6 +102,7 @@ public class WithdrawTest {
             final Withdraw withdraw = withdrawOpt.get();
 
             assertEquals(WITHDRAW_AMOUNT, withdraw.getAmount().toString());
+            assertEquals(WithdrawStatusEnum.DONE, withdraw.getStatus());
 
             final List<WithdrawAuditTracking> auditEvents =
                     withdrawAuditRepo.findByWithdrawIdOrderByEventCreatedAsc(withdraw.getId());
