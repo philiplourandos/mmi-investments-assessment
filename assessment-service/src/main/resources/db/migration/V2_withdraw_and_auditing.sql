@@ -11,4 +11,4 @@ CREATE TABLE withdraw_audit_tracking(
     withdraw_id BIGINT NOT NULL,
     status withdraw_status NOT NULL,
     event_created TIMESTAMP DEFAULT NOW(),
-    description VARCHAR(500));
+    previous_balance DECIMAL(20,2) NOT NULL;
