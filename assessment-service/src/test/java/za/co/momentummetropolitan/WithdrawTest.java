@@ -1,6 +1,8 @@
 package za.co.momentummetropolitan;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,6 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +29,24 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import za.co.momentummetropolitan.entities.ClientProduct;
+import za.co.momentummetropolitan.entities.Withdraw;
+import za.co.momentummetropolitan.entities.WithdrawAuditTracking;
 import za.co.momentummetropolitan.enums.AuthoritiesConst;
 import za.co.momentummetropolitan.enums.FinancialProductsEnum;
+import za.co.momentummetropolitan.enums.WithdrawStatusEnum;
 import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
+import za.co.momentummetropolitan.repository.WithdrawAuditRepository;
+import za.co.momentummetropolitan.repository.WithdrawRepository;
 
 @SpringBootTest
 @Testcontainers
 @AutoConfigureMockMvc
 @ActiveProfiles({"test"})
 public class WithdrawTest {
+    private static final String RETIREMENT_STARTING_BALANCE = "500000.00";
+    private static final String RETIREMENT_DONE_BALANCE = "450000.00";
+    private static final String WITHDRAW_AMOUNT = "50000.00";
+    
     @Container
     @ServiceConnection
     private static final PostgreSQLContainer POSTGRES = new PostgreSQLContainer(TestConst.POSTGRES_IMAGE);
@@ -45,6 +59,12 @@ public class WithdrawTest {
     
     @Autowired
     private ClientFinancialProductRepository clientFinProdRepo;
+    
+    @Autowired
+    private WithdrawAuditRepository withdrawAuditRepo;
+
+    @Autowired
+    private WithdrawRepository withdrawRepo;
 
     @Test
     @WithMockUser(username = "philip.lourandos", authorities = {AuthoritiesConst.CLIENT})
@@ -61,18 +81,45 @@ public class WithdrawTest {
                 .content("""
                          {
                             "clientProductId": "%s",
-                            "amount": "50000"
+                            "amount": "%s"
                          }
-                         """.formatted(clientsRetirementProduct.getId()))
+                         """.formatted(clientsRetirementProduct.getId(), WITHDRAW_AMOUNT))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         // then
         verify(mockDateSupplier, times(1)).get();
-        
-        final ClientProduct updatedClientProduct = clientFinProdRepo.findByClientIdAndType(
+
+        await().atMost(10, TimeUnit.SECONDS).until(() -> {
+            final ClientProduct updatedClientProduct = clientFinProdRepo.findByClientIdAndType(
                 Long.valueOf(TestConst.VALID_CLIENT_ID), FinancialProductsEnum.RETIREMENT)
                 .orElseThrow();
-        assertEquals("450000.00", updatedClientProduct.getBalance().toString());
+            assertEquals(RETIREMENT_DONE_BALANCE, updatedClientProduct.getBalance().toString());
+
+            final Optional<Withdraw> withdrawOpt = withdrawRepo.findByClientProductId(
+                    clientsRetirementProduct.getId());
+            assertTrue(withdrawOpt.isPresent());
+            final Withdraw withdraw = withdrawOpt.get();
+
+            assertEquals(WITHDRAW_AMOUNT, withdraw.getAmount().toString());
+
+            final List<WithdrawAuditTracking> auditEvents =
+                    withdrawAuditRepo.findByWithdrawIdOrderByEventCreatedAsc(withdraw.getId());
+            assertEquals(3, auditEvents.size());
+
+            final WithdrawAuditTracking startedEvent = auditEvents.get(0);
+            assertEquals(RETIREMENT_STARTING_BALANCE, startedEvent.getPreviousBalance().toString());
+            assertEquals(WithdrawStatusEnum.STARTED, startedEvent.getWithdrawStatus());
+
+            final WithdrawAuditTracking executingEvent = auditEvents.get(1);
+            assertEquals(RETIREMENT_STARTING_BALANCE, executingEvent.getPreviousBalance().toString());
+            assertEquals(WithdrawStatusEnum.EXECUTING, executingEvent.getWithdrawStatus());
+
+            final WithdrawAuditTracking doneEvent = auditEvents.get(2);
+            assertEquals(RETIREMENT_DONE_BALANCE, doneEvent.getPreviousBalance().toString());
+            assertEquals(WithdrawStatusEnum.DONE, doneEvent.getWithdrawStatus());
+
+            return true;
+        });
     }
 }
