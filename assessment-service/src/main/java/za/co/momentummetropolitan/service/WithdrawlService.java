@@ -5,12 +5,15 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import za.co.momentummetropolitan.entities.Client;
 import za.co.momentummetropolitan.entities.ClientProduct;
 import za.co.momentummetropolitan.entities.FinancialProduct;
+import za.co.momentummetropolitan.entities.Withdraw;
 import za.co.momentummetropolitan.enums.FinancialProductsEnum;
+import za.co.momentummetropolitan.enums.WithdrawStatusEnum;
 import za.co.momentummetropolitan.exceptions.ClientProductIdNotFoundException;
 import za.co.momentummetropolitan.exceptions.RetirementAgeNotAttainedException;
 import za.co.momentummetropolitan.exceptions.WithdrawAmountExceedsBalanceException;
@@ -18,6 +21,8 @@ import za.co.momentummetropolitan.exceptions.WithdrawPercentageExceedsThresholdE
 import za.co.momentummetropolitan.repository.ClientFinancialProductRepository;
 import za.co.momentummetropolitan.repository.ClientRepository;
 import za.co.momentummetropolitan.repository.FinancialProductRepository;
+import za.co.momentummetropolitan.repository.WithdrawRepository;
+import za.co.momentummetropolitan.service.event.WithdrawEvent;
 
 @Service
 public class WithdrawlService {
@@ -29,16 +34,21 @@ public class WithdrawlService {
     private final FinancialProductRepository financialProductRepo;
     private final Supplier<LocalDate> dateSupplier;
     private final BigDecimal maxWithdrawPercentage;
+    private final WithdrawRepository withdrawRepo;
+    private final ApplicationEventPublisher appEventPub;
 
     public WithdrawlService(final ClientRepository clientRepo, 
             final ClientFinancialProductRepository clientProductsRepo, 
             final FinancialProductRepository financialProductRepo, final Supplier<LocalDate> dateSupplier,
-            @Value("${mmi.investment.max-withdraw-percentage}") final BigDecimal maxWithdrawPercentage) {
+            @Value("${mmi.investment.max-withdraw-percentage}") final BigDecimal maxWithdrawPercentage,
+            final WithdrawRepository withdrawRepo, final ApplicationEventPublisher appEventPub) {
         this.clientRepo = clientRepo;
         this.clientProductsRepo = clientProductsRepo;
         this.dateSupplier = dateSupplier;
         this.financialProductRepo = financialProductRepo;
         this.maxWithdrawPercentage = maxWithdrawPercentage;
+        this.withdrawRepo = withdrawRepo;
+        this.appEventPub = appEventPub;
     }
 
     @Transactional
@@ -74,7 +84,12 @@ public class WithdrawlService {
             throw new WithdrawPercentageExceedsThresholdException(maxWithdrawPercentage, withdrawPercentage);
         }
 
-        foundClientProduct.setBalance(balance.subtract(withdrawAmount));
-        clientProductsRepo.save(foundClientProduct);
+        final Withdraw withdrawRequest = new Withdraw();
+        withdrawRequest.setAmount(withdrawAmount);
+        withdrawRequest.setClientProductId(clientProductId);
+        withdrawRequest.setStatus(WithdrawStatusEnum.STARTED);
+
+        final Long withdrawId = withdrawRepo.save(withdrawRequest).getId();
+        appEventPub.publishEvent(new WithdrawEvent(this, withdrawId));
     }
 }
